@@ -6,7 +6,7 @@
           <CCardGroup>
             <CCard class="p-4">
               <CCardBody>
-                <CForm>
+                <CForm @submit.prevent="handleSubmit" name="loginForm">
                   <h1>登录</h1>
                   <p class="text-body-secondary">请用您的账户登录</p>
                   <p v-if="error" class="error-message">{{ error }}</p>
@@ -15,25 +15,31 @@
                       <CIcon icon="cil-user" />
                     </CInputGroupText>
                     <CFormInput
-                      v-model="username"
                       placeholder="用户名"
                       autocomplete="username"
+                      v-model="form.username"
                     />
+                    <!-- <div v-if="v$.value.username.$error">
+                      {{ v$.value.username.$message }}
+                    </div> -->
                   </CInputGroup>
                   <CInputGroup class="mb-4">
                     <CInputGroupText>
                       <CIcon icon="cil-lock-locked" />
                     </CInputGroupText>
                     <CFormInput
-                      v-model="password"
                       type="password"
                       placeholder="密码"
                       autocomplete="current-password"
+                      v-model="form.password"
                     />
+                    <!-- <div v-if="v$.form.password.$error">
+                      {{ v$.form.password.$message }}
+                    </div> -->
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
-                      <CButton color="primary" class="px-4" @click="handleLogin" :disabled="isSubmitting"> 登录 </CButton>
+                      <CButton color="primary" class="px-4" type=submit :disabled="isSubmitting"> 登录 </CButton>
                     </CCol>
                     <CCol :xs="6" class="text-right">
                       <CButton color="link" class="px-0">
@@ -64,47 +70,89 @@
   </div>
 </template>
 
-<script>
-import { ref } from 'vue';
+<script setup>
+import { ref, reactive } from 'vue';
 import API from '@/services/api';
+import { useVuelidate } from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
 
-export default {
-  setup() {
-    // Create reactive refs for data properties
-    const username = ref('');
-    const password = ref('');
-    const isSubmitting = ref(false);
-    const error = ref('');
+// Create a reactive form object
+const form = reactive({
+  username: '',
+  password: ''
+});
 
-    // Define a method to handle login
-    const handleLogin = async () => {
-      isSubmitting.value = true;
-      try {
-        const response = await API.login(username.value, password.value);
-        if (response.detail) {
-          error.value = response.detail;
-        } else {
-          // Handle successful login, e.g., redirect or perform additional actions
-          // Example: this.$router.push('/dashboard');
-          error.value = "登录成功[access:" + API.getUser().access + "]"
-        }
-      } catch (err) {
-        error.value = err.message;
-      } finally {
-        // Enable the button after the server responds
-        isSubmitting.value = false;
-      }
-    };
+const rules = {
+  username: { required },
+  password: { required },
+};
 
-    // Return the exposed properties and methods
-    return {
-      username,
-      password,
-      error,
-      handleLogin,
-      isSubmitting,
-    };
-  },
+
+const error = ref('')
+const isSubmitting = ref(false)
+
+const v$ = useVuelidate(rules, form);
+console.dir(v$)
+console.log(v$.value.username)
+console.log(v$.value.password)
+
+    
+    // Create a validation instance
+    // const v$ = useVuelidate(rules, form);
+
+    // const validateForm = () => {
+    //   let valid = true;
+    //   if (!form.username) {
+    //     errors.username = '用户名必填';
+    //     valid = false;
+    //   } else {
+    //     errors.username = '';
+    //   }
+    //   if (!form.password) {
+    //     errors.password = '密码必填';
+    //     valid = false;
+    //   } else {
+    //     errors.password = '';
+    //   }
+    //   return valid;
+    // };
+
+
+// Define a method to handle login
+const handleLogin = async () => {
+  isSubmitting.value = true;
+  console.log("handleLogin")
+  try {
+    const response = await API.login(form.username, form.password);
+    if (response.detail) {
+      error.value = response.detail;
+    } else {
+      // Handle successful login, e.g., redirect or perform additional actions
+      // Example: this.$router.push('/dashboard');
+      error.value = "登录成功[access:" + API.getUser().access + "]"
+    }
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    // Enable the button after the server responds
+    isSubmitting.value = false;
+  }
+};
+
+const handleSubmit = async () => {
+  console.log("handleSubmit");
+  // 在 handleSubmit 方法中检查验证状态并显示错误信息
+  v$.value.$touch(); // 触发验证
+
+  if (v$.value.username.$error || v$.value.password.$error) {
+    console.dir(v$.value.username)
+    console.dir(v$.value.password)
+    error.value = '表单存在不正确的内容';
+    return;
+  }
+
+  // Process form submission
+  handleLogin();
 };
 </script>
 
@@ -112,4 +160,5 @@ export default {
 .error-message {
   color: red;
 }
+
 </style>

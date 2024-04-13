@@ -8,6 +8,7 @@ import CIcon from '@coreui/icons-vue'
 import { iconsSet as icons } from '@/assets/icons'
 import DocsExample from '@/components/DocsExample'
 
+
 const app = createApp(App)
 app.use(store)
 app.use(router)
