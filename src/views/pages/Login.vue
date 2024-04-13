@@ -18,10 +18,9 @@
                       placeholder="用户名"
                       autocomplete="username"
                       v-model="form.username"
+                      :invalid="formError.username != ''" 
+                      :feedbackInvalid="formError.username != '' ? formError.username : null"
                     />
-                    <!-- <div v-if="v$.value.username.$error">
-                      {{ v$.value.username.$message }}
-                    </div> -->
                   </CInputGroup>
                   <CInputGroup class="mb-4">
                     <CInputGroupText>
@@ -32,10 +31,9 @@
                       placeholder="密码"
                       autocomplete="current-password"
                       v-model="form.password"
+                      :invalid="formError.password != ''" 
+                      :feedbackInvalid="formError.password != '' ? formError.password : null"
                     />
-                    <!-- <div v-if="v$.form.password.$error">
-                      {{ v$.form.password.$message }}
-                    </div> -->
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
@@ -78,6 +76,11 @@ import { required } from '@vuelidate/validators';
 
 // Create a reactive form object
 const form = reactive({
+  username: '',
+  password: ''
+});
+
+const formError = reactive({
   username: '',
   password: ''
 });
@@ -141,15 +144,12 @@ const handleLogin = async () => {
 
 const handleSubmit = async () => {
   console.log("handleSubmit");
-  // 在 handleSubmit 方法中检查验证状态并显示错误信息
+  formError.username = ""
+  formError.password = ""
   v$.value.$touch(); // 触发验证
-
-  if (v$.value.username.$error || v$.value.password.$error) {
-    console.dir(v$.value.username)
-    console.dir(v$.value.password)
-    error.value = '表单存在不正确的内容';
-    return;
-  }
+  if (v$.value.username.$error) formError.username = "用户名输入不正确";
+  if (v$.value.password.$error) formError.password = "密码输入不正确";
+  if (v$.value.username.$error || v$.value.password.$error) return
 
   // Process form submission
   handleLogin();
