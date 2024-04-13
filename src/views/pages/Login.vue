@@ -33,7 +33,7 @@
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
-                      <CButton color="primary" class="px-4" @click="handleLogin"> 登录 </CButton>
+                      <CButton color="primary" class="px-4" @click="handleLogin" :disabled="isSubmitting"> 登录 </CButton>
                     </CCol>
                     <CCol :xs="6" class="text-right">
                       <CButton color="link" class="px-0">
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { ref, reactive   } from 'vue';
+import { ref } from 'vue';
 import API from '@/services/api';
 
 export default {
@@ -73,10 +73,12 @@ export default {
     // Create reactive refs for data properties
     const username = ref('');
     const password = ref('');
+    const isSubmitting = ref(false);
     const error = ref('');
 
     // Define a method to handle login
     const handleLogin = async () => {
+      isSubmitting.value = true;
       try {
         const response = await API.login(username.value, password.value);
         if (response.detail) {
@@ -88,6 +90,9 @@ export default {
         }
       } catch (err) {
         error.value = err.message;
+      } finally {
+        // Enable the button after the server responds
+        isSubmitting.value = false;
       }
     };
 
@@ -97,6 +102,7 @@ export default {
       password,
       error,
       handleLogin,
+      isSubmitting,
     };
   },
 };
