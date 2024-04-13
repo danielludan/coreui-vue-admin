@@ -33,7 +33,7 @@
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
-                      <CButton color="primary" class="px-4" @click="login"> 登录 </CButton>
+                      <CButton color="primary" class="px-4" @click="handleLogin"> 登录 </CButton>
                     </CCol>
                     <CCol :xs="6" class="text-right">
                       <CButton color="link" class="px-0">
@@ -65,30 +65,39 @@
 </template>
 
 <script>
+import { ref, reactive   } from 'vue';
 import API from '@/services/api';
 
 export default {
-  data() {
-    return {
-      username: '',
-      password: '',
-      error: '',
-    };
-  },
-  methods: {
-    login() {
-      API.login(this.username, this.password)
-        .then((data) => {
-          if (data.detail) {
-            this.error = data.detail
-          }
+  setup() {
+    // Create reactive refs for data properties
+    const username = ref('');
+    const password = ref('');
+    const error = ref('');
+
+    // Define a method to handle login
+    const handleLogin = async () => {
+      try {
+        const response = await API.login(username.value, password.value);
+        if (response.detail) {
+          error.value = response.detail;
+        } else {
           // Handle successful login, e.g., redirect or perform additional actions
           // Example: this.$router.push('/dashboard');
-        })
-        .catch(error => {
-          this.error = error.message;
-        });
-    },
+          error.value = "登录成功[access:" + API.getUser().access + "]"
+        }
+      } catch (err) {
+        error.value = err.message;
+      }
+    };
+
+    // Return the exposed properties and methods
+    return {
+      username,
+      password,
+      error,
+      handleLogin,
+    };
   },
 };
 </script>

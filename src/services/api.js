@@ -33,7 +33,10 @@ instance.interceptors.response.use(
             } else if (status === 404) {
                 // 处理资源未找到错误
                 return Promise.reject({ message: '资源找不到' });
-            } else {
+            }  else if (status === 400) {
+              // 处理资源未找到错误
+              return Promise.reject({ message: '请求参数异常' });
+           } else {
                 // 处理其他HTTP错误
                 return Promise.reject({ message: '未知响应异常' });
             }
@@ -52,10 +55,10 @@ class API {
       username,
       password,
     }).then(response => {
-      if (response.data.access) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+      if (response.access) {
+        localStorage.setItem('user', JSON.stringify(response));
       }
-      return response.data;
+      return response;
     });
   }
 
