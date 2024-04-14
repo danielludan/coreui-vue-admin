@@ -69,10 +69,12 @@
 </template>
 
 <script setup>
+
 import { ref, reactive } from 'vue';
 import API from '@/services/api';
 import { useVuelidate } from '@vuelidate/core';
 import { required } from '@vuelidate/validators';
+import router from '@/router'
 
 // Create a reactive form object
 const form = reactive({
@@ -90,36 +92,10 @@ const rules = {
   password: { required },
 };
 
-
 const error = ref('')
 const isSubmitting = ref(false)
 
 const v$ = useVuelidate(rules, form);
-console.dir(v$)
-console.log(v$.value.username)
-console.log(v$.value.password)
-
-    
-    // Create a validation instance
-    // const v$ = useVuelidate(rules, form);
-
-    // const validateForm = () => {
-    //   let valid = true;
-    //   if (!form.username) {
-    //     errors.username = '用户名必填';
-    //     valid = false;
-    //   } else {
-    //     errors.username = '';
-    //   }
-    //   if (!form.password) {
-    //     errors.password = '密码必填';
-    //     valid = false;
-    //   } else {
-    //     errors.password = '';
-    //   }
-    //   return valid;
-    // };
-
 
 // Define a method to handle login
 const handleLogin = async () => {
@@ -131,8 +107,9 @@ const handleLogin = async () => {
       error.value = response.detail;
     } else {
       // Handle successful login, e.g., redirect or perform additional actions
-      // Example: this.$router.push('/dashboard');
-      error.value = "登录成功[access:" + API.getUser().access + "]"
+      // error.value = "登录成功[access:" + API.getUser().access + "]"
+      // 跳转到dashboard主页面
+      router.push('/dashboard');
     }
   } catch (err) {
     error.value = err.message;
@@ -142,10 +119,15 @@ const handleLogin = async () => {
   }
 };
 
+const reset = () => {
+  formError.username = "";
+  formError.password = "";
+  error.value = "";
+}
+
 const handleSubmit = async () => {
   console.log("handleSubmit");
-  formError.username = ""
-  formError.password = ""
+  reset();
   v$.value.$touch(); // 触发验证
   if (v$.value.username.$error) formError.username = "用户名输入不正确";
   if (v$.value.password.$error) formError.password = "密码输入不正确";
@@ -154,9 +136,11 @@ const handleSubmit = async () => {
   // Process form submission
   handleLogin();
 };
+
 </script>
 
 <style scoped>
+
 .error-message {
   color: red;
 }
