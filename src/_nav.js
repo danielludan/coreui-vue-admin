@@ -11,6 +11,22 @@ export default [
   },
   {
     component: 'CNavTitle',
+    name: '字典管理',
+  },
+  {
+    component: 'CNavItem',
+    name: '字典分类',
+    to: '/dict/cat/list',
+    icon: 'cil-drop',
+  },
+  {
+    component: 'CNavItem',
+    name: '字典',
+    to: '/dict/list',
+    icon: 'cil-pencil',
+  },
+  {
+    component: 'CNavTitle',
     name: 'Theme',
   },
   {

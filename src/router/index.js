@@ -22,6 +22,21 @@ const routes = [
           ),
       },
       {
+        path: '/dict/list',
+        name: 'Dict',
+        component: () => import('@/views/dict/list.vue'),
+      },
+      {
+        path: '/dict/cat/list',
+        name: 'DictCat',
+        component: () => import('@/views/dict/cat/list.vue'),
+      },
+      {
+        path: '/theme/typography',
+        name: 'Typography',
+        component: () => import('@/views/theme/Typography.vue'),
+      },
+      {
         path: '/theme',
         name: 'Theme',
         redirect: '/theme/typography',
