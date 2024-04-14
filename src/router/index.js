@@ -23,12 +23,12 @@ const routes = [
       },
       {
         path: '/dict/list',
-        name: 'Dict',
+        name: '字典列表',
         component: () => import('@/views/dict/list.vue'),
       },
       {
         path: '/dict/cat/list',
-        name: 'DictCat',
+        name: '字典分类列表',
         component: () => import('@/views/dict/cat/list.vue'),
       },
       {
