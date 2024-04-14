@@ -100,7 +100,7 @@ class API {
     return instance.get(API_DICT_URL, {
       params, // Pass query parameters for filtering
     }).then((response) => {
-      const { results, count } = response.data; // Extract data from response
+      const { results, count } = response; // Extract data from response
       return { results, count }; // Return data and total count
     });
   }
